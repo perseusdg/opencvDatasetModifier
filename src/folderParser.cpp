@@ -8,6 +8,7 @@ namespace fs = std::filesystem;
 using std::cin;
 using std::cout;
 using std::fstream;
+using std::to_string;
 
 void folderParser::FolderParser(std::string &pathToDirectory,bool custom)
 {
@@ -15,7 +16,7 @@ void folderParser::FolderParser(std::string &pathToDirectory,bool custom)
     for(const auto & entry:fs::directory_iterator(pathToDirectory))
         {
             n = n+1;
-            std::string path = entry.path();
+            std::string path = (entry.path().string());
             imageIntegrityCheckerAndPropertyRetriver(path,custom,n);
 
         }
@@ -34,7 +35,7 @@ void folderParser::imageIntegrityCheckerAndPropertyRetriver(std::string &pathToI
     std::string resultLocation;
     std::string analysisLocation;
     Mat image;
-    std::string current_path = fs::current_path();
+    std::string current_path = fs::current_path().string();
     if(custom)
     {
         resultLocation = current_path + "/corruptedCustomImages.txt";
@@ -74,7 +75,7 @@ void folderParser::imageIntegrityCheckerAndPropertyRetriver(std::string &pathToI
             int i_width = image.rows;
             fstream fout;
             fout.open(analysisLocation,std::ios::out|std::ios::app);
-            fout<<n<<","<<pathToImage<<","<<i_height<<","<<i_width<<std::endl;
+            fout<<n-1<<","<<pathToImage<<","<<i_height<<","<<i_width<<std::endl;
             fout.close();
         }
 

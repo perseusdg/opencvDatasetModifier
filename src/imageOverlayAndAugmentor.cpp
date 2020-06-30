@@ -2,16 +2,18 @@
 #include "imageOverlayAndAugmentor.h"
 
 
-void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::string& analysis,long int analysisLineNumbers,long int analysisCustomLineNumbers)
+void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::string& analysis,const long  analysisLineNumbers,const long analysisCustomLineNumbers)
 {
    cv::Mat customImage,datasetImage,image;
 
-    long int N1[analysisLineNumbers];
-    for(long int i=0;i<analysisLineNumbers;i++)
-        N1[i] = 0;
+   std::vector<long int> N1;
 
+    for(long i=0;i<analysisLineNumbers;i++)
+        N1.push_back(0);
+    N1.push_back(0);
     //minimum number of readymade_images per custom image
-    long int imgRatio,num;
+    long int imgRatio;
+    long int num;
     if(analysisLineNumbers%analysisCustomLineNumbers == 0)
     {
         imgRatio = analysisLineNumbers/analysisCustomLineNumbers;
@@ -20,6 +22,8 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
     {
         imgRatio = analysisLineNumbers/analysisCustomLineNumbers +1 ;
     }
+
+    std::cout << imgRatio << std::endl;
     
 
     //attaching to os processes
@@ -44,6 +48,8 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
     std::uniform_int_distribution<std::mt19937::result_type> n1(0,analysisLineNumbers);
     std::uniform_int_distribution<std::mt19937::result_type> n2(0,analysisCustomLineNumbers);
     std::uniform_int_distribution<std::mt19937::result_type> imageAdjuster(0,10);
+    num = 0;
+   
 
 
     for(int i=1;i<=analysisCustomLineNumbers;i++)
@@ -65,22 +71,28 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
         {
             rowCustom.push_back(wordCustom);
         }
+        std::cout << rowCustom[1] << std::endl;
 
         customImage = cv::imread(rowCustom[1],cv::IMREAD_COLOR);
 
-        std::ifstream csvReader(analysis);
-        std::string word,line;
-        std::vector<std::string> row;
-        line.reserve(300);
+      
 
         //selecting a random analysiscustomlinenumbers
+        std::cout << imgRatio << std::endl;
 
         for(long int k=0;k<imgRatio;k++)
-        {            
+        { 
+            std::ifstream csvReader(analysis);
+            std::string word, line;
+            std::vector<std::string> row;
+            line.reserve(300);
+            std::cout << num << std::endl;
             while(N1[num] == 1)
             {
                 num = n1(mt6);
+                std::cout << num << std::endl;
             }
+            std::cout << num << std::endl;
 
             N1[num] = 1;
             for(long int a=0;a<num-1;a++)
@@ -92,7 +104,9 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
             {
                 row.push_back(word);
             }
+            std::cout << row[1] << std::endl;
             datasetImage = cv::imread(row[1],cv::IMREAD_COLOR);
+            std::cout << row[1] << std::endl;
             if((int)imageAdjuster(mt4)>=6)
             {
             datasetImage1 = imageBrightnessAndContrastControl(datasetImage,(int)beta(mt4),(int)alpha(mt5));
@@ -101,14 +115,15 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
             {
                 datasetImage1 = datasetImage;
             }
-            
+            std::cout << "Hellllooo" << std::endl;
             image = imageOverlay(customImage,datasetImage1,(int)x(rd),(int)y(rd2));
 
             std::string imageName = std::to_string(num) + "customImages_" + std::to_string(i) + ".jpeg";
             cv::imwrite(imageName,image);
-            csvReader.clear();
+          
         }
         //closing csvReader Custom
+  
     }
 }
 
@@ -132,21 +147,19 @@ cv::Mat imageOverlayAndAugmentor::imageBrightnessAndContrastControl(cv::Mat imag
 
 cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat datasetImage,int x,int y) 
 {
-
-    std::cout<<customImage.cols<<":"<<customImage.rows<<std::endl;
+    std::cout << datasetImage.cols << ":" << datasetImage.rows << std::endl;
     if(1920>(int)customImage.cols+x)
     {
         if(1080 > (int)customImage.rows+y)
         {
             x=x;
             y=y;
-            std::cout<<"1."<<x<<":"<<y<<std::endl;
         }
         else
         {
             x=x;
             y=1080-(int)customImage.rows;
-            std::cout<<"2."<<x<<":"<<y<<std::endl;
+           
 
             
         }
@@ -158,14 +171,14 @@ cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat data
         {
             x=1920-(int)customImage.cols;
             y=y;
-            std::cout<<"3."<<x<<":"<<y<<std::endl;
+      
 
         }
         else
         {
             x=1920-(int)customImage.cols;
             y=1080-(int)customImage.rows;
-            std::cout<<"4."<<x<<":"<<y<<std::endl;
+          
 
         }
         

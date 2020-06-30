@@ -6,11 +6,9 @@
 #define OPENCVDATASETCREATOR_IMAGEOVERLAYANDAUGMENTOR_H
 #include<iostream>
 #include<string>
-#include<opencv4/opencv2/opencv.hpp>
+#include<opencv2/opencv.hpp>
 #include<opencv2/opencv.hpp>
 #include<filesystem>
-#include<opencv4/opencv2/imgcodecs.hpp>
-#include <opencv4/opencv2/highgui.hpp>
 #include <fstream>
 #include <random>
 #include <sstream>
@@ -18,7 +16,8 @@
 
 class imageOverlayAndAugmentor {
     public:
-        void imageController(std::string &analysisCustom, std::string &analysis, long analysisLineNumbers,long analysisCustomLineNumbers);
+        void imageController(std::string &analysisCustom, std::string &analysis, const long analysisLineNumbers,const long analysisCustomLineNumbers);
+        
 
 private:
         cv::Mat imageBrightnessAndContrastControl(cv::Mat image,int brightnessRandom,int contrastRandom);

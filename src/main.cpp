@@ -8,8 +8,8 @@ namespace fs = std::filesystem;
 
 int main()
 {
-    folderParser fParser;
-    imageOverlayAndAugmentor img;
+    folderParser *fParser = new folderParser;
+    imageOverlayAndAugmentor *img = new imageOverlayAndAugmentor;
     std::string folder_custom,folder_readymade;
 
     std::cout<<"Enter the absolute path of dataset to be imposed on:";
@@ -40,22 +40,20 @@ int main()
         std::cout<<"Incorrect entry,exiting program!!";
         return -1;
     }
-    fParser.FolderParser(folder_readymade,false);
-    fParser.FolderParser(folder_custom,true);
-    std::string current_path = fs::current_path();
+    fParser->FolderParser(folder_readymade,false);
+    fParser->FolderParser(folder_custom,true);
+    std::string current_path = fs::current_path().string();
 
     std::string analysisCustomLocation =current_path + "/analysisCustom.csv";
     std::string analysisLocation =current_path + "/analysis.csv";
-    std::cout<<fParser.lineNumbersCustom<<std::endl;
-    std::cout<<fParser.lineNumbersReady<<std::endl;
+   
+  
 
-    img.imageController(analysisCustomLocation,analysisLocation,fParser.lineNumbersReady,fParser.lineNumbersCustom);
+    img->imageController(analysisCustomLocation,analysisLocation,fParser->lineNumbersReady,fParser->lineNumbersCustom);
+    std::cout << "Hellllllloooo0";
+    std::cout << fParser->lineNumbersReady << std::endl;
+    std::cout << fParser->lineNumbersCustom << std::endl;
 
-
-
-    std::cout<<fParser.lineNumbersCustom<<std::endl;
-    std::cout<<fParser.lineNumbersReady<<std::endl;
-    return 0;
 
 
 
