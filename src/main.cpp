@@ -20,26 +20,7 @@ int main()
     std::getline(std::cin,folder_custom);
     std::cout<<std::endl;
 
-    int choice;
-    std::cout<<"Would you like to perform image augmentation on both datasets(0),on the your dataset(1),on the readymade dataset(2) :";
-    std::cin>>choice;
-    if(choice == 0)
-    {
-        std::cout<<"Image augmentation will be performed on both";
-    }
-    else if(choice == 1)
-    {
-        std::cout<<"Image augmentation will be performed on your dataset";
-    }
-    else if(choice == 2)
-    {
-        std::cout<<"Limited image augmentation will be performed on the ready made dataset only";
-    }
-    else
-    {
-        std::cout<<"Incorrect entry,exiting program!!";
-        return -1;
-    }
+   
     fParser->FolderParser(folder_readymade,false);
     fParser->FolderParser(folder_custom,true);
     std::string current_path = fs::current_path().string();
@@ -47,13 +28,12 @@ int main()
     std::string analysisCustomLocation =current_path + "/analysisCustom.csv";
     std::string analysisLocation =current_path + "/analysis.csv";
    
-  
 
-    img->imageController(analysisCustomLocation,analysisLocation,fParser->lineNumbersReady,fParser->lineNumbersCustom);
-    std::cout << "Hellllllloooo0";
-    std::cout << fParser->lineNumbersReady << std::endl;
-    std::cout << fParser->lineNumbersCustom << std::endl;
-
+    img->imageController(analysisCustomLocation,analysisLocation,fParser->lineNumbersReady -1,fParser->lineNumbersCustom -1);
+   
+   
+    delete img;
+    delete fParser;
 
 
 

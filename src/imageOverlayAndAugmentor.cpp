@@ -4,13 +4,15 @@
 
 void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::string& analysis,const long  analysisLineNumbers,const long analysisCustomLineNumbers)
 {
+   
+
    cv::Mat customImage,datasetImage,image;
 
    std::vector<long int> N1;
 
     for(long i=0;i<analysisLineNumbers;i++)
         N1.push_back(0);
-    N1.push_back(0);
+    
     //minimum number of readymade_images per custom image
     long int imgRatio;
     long int num;
@@ -23,7 +25,6 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
         imgRatio = analysisLineNumbers/analysisCustomLineNumbers +1 ;
     }
 
-    std::cout << imgRatio << std::endl;
     
 
     //attaching to os processes
@@ -45,9 +46,10 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
     std::uniform_int_distribution<std::mt19937::result_type> y(0,1080);
     std::uniform_int_distribution<std::mt19937::result_type> alpha(1,3);
     std::uniform_int_distribution<std::mt19937::result_type> beta(0,100);
-    std::uniform_int_distribution<std::mt19937::result_type> n1(0,analysisLineNumbers);
+    std::uniform_int_distribution<std::mt19937::result_type> n1(0,analysisLineNumbers - 1);
     std::uniform_int_distribution<std::mt19937::result_type> n2(0,analysisCustomLineNumbers);
     std::uniform_int_distribution<std::mt19937::result_type> imageAdjuster(0,10);
+    std::uniform_int_distribution<std::mt19937::result_type> randomer(0, 1000);
     num = 0;
    
 
@@ -55,7 +57,6 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
     for(int i=1;i<=analysisCustomLineNumbers;i++)
     {
         cv::Mat datasetImage1;
-        int xmin,ymin,xmax,ymax;
         std::ifstream csvReaderCustom(analysisCustom);
         std::string wordCustom,lineCustom;
         std::vector<std::string> rowCustom;
@@ -71,14 +72,13 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
         {
             rowCustom.push_back(wordCustom);
         }
-        std::cout << rowCustom[1] << std::endl;
-
+       
         customImage = cv::imread(rowCustom[1],cv::IMREAD_COLOR);
-
+        
       
 
         //selecting a random analysiscustomlinenumbers
-        std::cout << imgRatio << std::endl;
+        
 
         for(long int k=0;k<imgRatio;k++)
         { 
@@ -86,15 +86,16 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
             std::string word, line;
             std::vector<std::string> row;
             line.reserve(300);
-            std::cout << num << std::endl;
+            row.clear();
             while(N1[num] == 1)
             {
-                num = n1(mt6);
-                std::cout << num << std::endl;
+                if (num < analysisLineNumbers)
+                {
+                    num = n1(mt6);
+                }
             }
-            std::cout << num << std::endl;
 
-            N1[num] = 1;
+            N1[num] = 1;    
             for(long int a=0;a<num-1;a++)
                 std::getline(csvReader,line);
             row.clear();
@@ -104,9 +105,10 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
             {
                 row.push_back(word);
             }
-            std::cout << row[1] << std::endl;
+           
+    
             datasetImage = cv::imread(row[1],cv::IMREAD_COLOR);
-            std::cout << row[1] << std::endl;
+         
             if((int)imageAdjuster(mt4)>=6)
             {
             datasetImage1 = imageBrightnessAndContrastControl(datasetImage,(int)beta(mt4),(int)alpha(mt5));
@@ -115,15 +117,20 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
             {
                 datasetImage1 = datasetImage;
             }
-            std::cout << "Hellllooo" << std::endl;
-            image = imageOverlay(customImage,datasetImage1,(int)x(rd),(int)y(rd2));
-
-            std::string imageName = std::to_string(num) + "customImages_" + std::to_string(i) + ".jpeg";
-            cv::imwrite(imageName,image);
-          
+            std::string Name = std::to_string(num) + "customImages_" + std::to_string(i);
+            std::string imgName = Name + ".jpeg";
+            if ((int)randomer(mt3) <= 450)
+            {
+                image = imageOverlay(customImage, datasetImage1, (int)x(mt3), (int)y(mt4), Name);
+            }
+            else
+            {
+                image = imageRotater(customImage, datasetImage1, (int)x(mt3), (int)y(mt5), Name);
+            }
+            imageSaver(imgName, image);
         }
         //closing csvReader Custom
-  
+        
     }
 }
 
@@ -145,9 +152,9 @@ cv::Mat imageOverlayAndAugmentor::imageBrightnessAndContrastControl(cv::Mat imag
 }
 
 
-cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat datasetImage,int x,int y) 
+cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat datasetImage,int x,int y,std::string imgName) 
 {
-    std::cout << datasetImage.cols << ":" << datasetImage.rows << std::endl;
+    
     if(1920>(int)customImage.cols+x)
     {
         if(1080 > (int)customImage.rows+y)
@@ -157,11 +164,7 @@ cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat data
         }
         else
         {
-            x=x;
-            y=1080-(int)customImage.rows;
-           
-
-            
+            y=1080-(int)customImage.rows;   
         }
         
     }
@@ -170,15 +173,12 @@ cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat data
         if(1080 > (int)customImage.rows + y)
         {
             x=1920-(int)customImage.cols;
-            y=y;
-      
 
         }
         else
         {
             x=1920-(int)customImage.cols;
-            y=1080-(int)customImage.rows;
-          
+            y=1080-(int)customImage.rows;  
 
         }
         
@@ -187,5 +187,112 @@ cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat data
     cv::Mat croppedImage;
     croppedImage = datasetImage(cv::Rect(x,y,customImage.cols,customImage.rows));
     customImage.copyTo(croppedImage);
+    std::string bboxName = imgName + ".txt";
+    boundingBox(x, y, customImage.rows, customImage.cols,bboxName);
     return datasetImage;
+}
+
+cv::Mat imageOverlayAndAugmentor::imageRotater(cv::Mat customImage,cv::Mat randomImage,int X,int Y,std::string imageName)
+{
+    bool negative = false;
+    std::random_device rd;
+    std::mt19937 mt(rd());
+
+    std::uniform_int_distribution<std::mt19937::result_type> Angle(0,30);
+    double angle = (int)Angle(mt);
+    int x = X;
+    int y = Y;
+
+    double angleRad = (angle / 180) * 3.14;
+    //bounding box calculations
+
+    //rotating the image 
+    cv::Point2f center((customImage.cols - 1) / 2.0, (customImage.rows - 1) / 2.0);
+    cv::Mat rot = cv::getRotationMatrix2D(center, angle,1.0);
+    cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), customImage.size(), angle).boundingRect2f();
+    rot.at<double>(0, 2) += bbox.width / 2.0 - customImage.cols / 2.0;
+    rot.at<double>(1, 2) += bbox.height / 2.0 - customImage.rows / 2.0;
+    cv::Mat dst;
+    cv::warpAffine(customImage, dst, rot, bbox.size());
+    int height = dst.rows;
+    int width = dst.cols;
+    cv::imwrite("test.png", dst);
+    cv::waitKey(2);
+
+    if (1920 > dst.cols + x)
+    {
+        if (1080 > dst.rows + y)
+        {
+            x = x;
+            y = y;
+        }
+        else
+        {
+            y = 1080 - dst.rows;
+        }
+
+    }
+    else
+    {
+        if (1080 > dst.rows + y)
+        {
+            x = 1920 - dst.cols;
+
+        }
+        else
+        {
+            x = 1920 - dst.cols;
+            y = 1080 - dst.rows;
+
+        }
+
+    }
+
+    cv::Mat image = randomImage;
+    cv::Mat croppedImage;
+    croppedImage = image(cv::Rect(x, y, dst.cols, dst.rows));
+    dst.copyTo(croppedImage);
+    std::string bboxName = imageName + ".txt";
+    boundingBox(x, y, width, height, bboxName);
+    return image;
+}
+
+
+
+void imageOverlayAndAugmentor::boundingBox(int x, int y, int h, int w, std::string name)
+{
+    double xmid = (double)(x + (h / 2))/1920;
+    double ymid = (double)(y + (w / 2))/1080;
+    double H = (double)h / 1080;
+    double W = (double) w / 1920;
+    std::string bboxName;
+    if (std::filesystem::exists("bbox"))
+    {
+        bboxName = "bbox\\" + name;
+    }
+    else
+    {
+        std::filesystem::create_directory("bbox");
+        bboxName = "bbox\\" + name;
+    }
+    std::fstream fout;
+    fout.open(bboxName, std::ios::out);
+    fout <<0<<" "<< xmid << " " << ymid << " " << W << " " << H;
+    fout.close();
+}
+
+void imageOverlayAndAugmentor::imageSaver(std::string imgName,cv::Mat image)
+{
+    std::string imageName;
+    if (std::filesystem::exists("image"))
+    {
+        imageName = "image\\" + imgName;
+    }
+    else
+    {
+        std::filesystem::create_directory("image");
+        imageName = "image\\" + imgName;
+    }
+    cv::imwrite(imageName, image);
+    
 }

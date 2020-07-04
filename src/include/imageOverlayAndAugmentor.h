@@ -21,7 +21,10 @@ class imageOverlayAndAugmentor {
 
 private:
         cv::Mat imageBrightnessAndContrastControl(cv::Mat image,int brightnessRandom,int contrastRandom);
-        cv::Mat imageOverlay(cv::Mat customImage,cv::Mat randomImage,int x,int y);
+        cv::Mat imageOverlay(cv::Mat customImage,cv::Mat randomImage,int x,int y,std::string imageName);
+        cv::Mat imageRotater(cv::Mat customImage, cv::Mat randomImage, int x, int y, std::string imageName);
+        void boundingBox(int XMid,int YMid,int h,int w,std::string name);
+        void imageSaver(std::string imgName,cv::Mat image);
 
 
 };
