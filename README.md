@@ -14,3 +14,4 @@ To Do:
 2)Remove black patches when rotating image
 3)add more filters in addition to contrast and brightness
 4) csv loader becomes slower for larger datasets,implementing a faster csv reader
+5)Only supports full hd images ,support for higher resolution images coming up soon!!
