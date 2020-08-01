@@ -1,6 +1,14 @@
 //created by harshvardhan
 #include "imageOverlayAndAugmentor.h"
 
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#endif
+
 
 void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::string& analysis,const long  analysisLineNumbers,const long analysisCustomLineNumbers)
 {
@@ -266,13 +274,13 @@ void imageOverlayAndAugmentor::boundingBox(int x, int y, int h, int w, std::stri
     double H = (double)h / 1080;
     double W = (double) w / 1920;
     std::string bboxName;
-    if (std::filesystem::exists("bbox"))
+    if (fs::exists("bbox"))
     {
         bboxName = "bbox\\" + name;
     }
     else
     {
-        std::filesystem::create_directory("bbox");
+        fs::create_directory("bbox");
         bboxName = "bbox\\" + name;
     }
     std::fstream fout;
@@ -284,13 +292,13 @@ void imageOverlayAndAugmentor::boundingBox(int x, int y, int h, int w, std::stri
 void imageOverlayAndAugmentor::imageSaver(std::string imgName,cv::Mat image)
 {
     std::string imageName;
-    if (std::filesystem::exists("image"))
+    if (fs::exists("image"))
     {
         imageName = "image\\" + imgName;
     }
     else
     {
-        std::filesystem::create_directory("image");
+        fs::create_directory("image");
         imageName = "image\\" + imgName;
     }
     cv::imwrite(imageName, image);
