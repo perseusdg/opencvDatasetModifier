@@ -8,11 +8,12 @@
 #include<string>
 #include<opencv2/opencv.hpp>
 #include<opencv2/opencv.hpp>
-#include<filesystem>
+
 #include <fstream>
 #include <random>
 #include <sstream>
 
+#define PI 3.14159265359
 
 class imageOverlayAndAugmentor {
     public:
@@ -21,6 +22,8 @@ class imageOverlayAndAugmentor {
 
 private:
         cv::Mat imageBrightnessAndContrastControl(cv::Mat image,int brightnessRandom,int contrastRandom);
+        cv::Mat GaussianNoise(const cv::Mat src, double Mean, double StdDev);
+        cv::Mat ColorJitter(const cv::Mat src, double maxjit);
         cv::Mat imageOverlay(cv::Mat customImage,cv::Mat randomImage,int x,int y,std::string imageName);
         cv::Mat imageRotater(cv::Mat customImage, cv::Mat randomImage, int x, int y, std::string imageName);
         void boundingBox(int XMid,int YMid,int h,int w,std::string name);
