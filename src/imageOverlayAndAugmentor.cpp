@@ -58,6 +58,7 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
     std::uniform_int_distribution<std::mt19937::result_type> n2(0,analysisCustomLineNumbers);
     std::uniform_int_distribution<std::mt19937::result_type> imageAdjuster(0,10);
     std::uniform_int_distribution<std::mt19937::result_type> randomer(0, 1000);
+    std::uniform_int_distribution<std::mt19937::result_type> noise_stddev(0, 30);
     num = 0;
    
 
@@ -123,7 +124,8 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
             }
             else
             {
-                datasetImage1 = datasetImage;
+                datasetImage1 = GaussianNoise(datasetImage, 0.0, (int)noise_stddev(mt4));
+                datasetImage1 = ColorJitter(datasetImage1, 20.0);
             }
             std::string Name = std::to_string(num) + "customImages_" + std::to_string(i);
             std::string imgName = Name + ".jpeg";
@@ -132,10 +134,12 @@ void imageOverlayAndAugmentor::imageController(std::string& analysisCustom,std::
                 image = imageOverlay(customImage, datasetImage1, (int)x(mt3), (int)y(mt4), Name);
             }
             else
-            {
+            { 
                 image = imageRotater(customImage, datasetImage1, (int)x(mt3), (int)y(mt5), Name);
             }
+
             imageSaver(imgName, image);
+            
         }
         //closing csvReader Custom
         
@@ -159,6 +163,46 @@ cv::Mat imageOverlayAndAugmentor::imageBrightnessAndContrastControl(cv::Mat imag
     return modifiedImg;
 }
 
+
+cv::Mat imageOverlayAndAugmentor::GaussianNoise(const cv::Mat src, double Mean, double StdDev)
+{
+    cv::Mat src_16SC, dst;
+    cv::Mat Gauss_noise = cv::Mat(src.size(), CV_16SC3);
+    cv::randn(Gauss_noise, cv::Scalar::all(Mean), cv::Scalar::all(StdDev));
+
+    src.convertTo(src_16SC, CV_16SC3);
+    cv::addWeighted(src_16SC, 1.0, Gauss_noise, 1.0, 0.0, src_16SC);
+    src_16SC.convertTo(dst, src.type());
+    return dst;
+}
+
+cv::Mat imageOverlayAndAugmentor::ColorJitter(const cv::Mat src, double maxjit)
+{
+    cv::Mat img, dst;
+    cv::cvtColor(src, img, CV_BGR2HSV);
+
+    std::random_device rd;
+    std::mt19937 mt(rd());
+
+    std::uniform_int_distribution<std::mt19937::result_type> jitter(-maxjit,maxjit);
+
+    for (int c = 0; c<img.channels(); c++)
+    {
+        double jit = (int)jitter(mt);
+        
+        for (int i=0; i<img.rows; i++)
+        {
+            for (int j=0; j<img.cols; j++)
+            {
+                img.at<cv::Vec3b>(i,j)[c] = cv::saturate_cast<uchar>(img.at<cv::Vec3b>(i,j)[c]+ jit);
+            }
+        }
+    }
+
+    cv::cvtColor(img, dst, CV_HSV2BGR);
+
+    return dst;
+}
 
 cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat datasetImage,int x,int y,std::string imgName) 
 {
@@ -200,6 +244,8 @@ cv::Mat imageOverlayAndAugmentor::imageOverlay(cv::Mat customImage, cv::Mat data
     return datasetImage;
 }
 
+
+
 cv::Mat imageOverlayAndAugmentor::imageRotater(cv::Mat customImage,cv::Mat randomImage,int X,int Y,std::string imageName)
 {
     bool negative = false;
@@ -224,8 +270,8 @@ cv::Mat imageOverlayAndAugmentor::imageRotater(cv::Mat customImage,cv::Mat rando
     cv::warpAffine(customImage, dst, rot, bbox.size());
     int height = dst.rows;
     int width = dst.cols;
-    cv::imwrite("test.png", dst);
-    cv::waitKey(2);
+    //cv::imwrite("test.png", dst);
+    //cv::waitKey(2);
 
     if (1920 > dst.cols + x)
     {
@@ -256,13 +302,13 @@ cv::Mat imageOverlayAndAugmentor::imageRotater(cv::Mat customImage,cv::Mat rando
 
     }
 
-    cv::Mat image = randomImage;
-    cv::Mat croppedImage;
-    croppedImage = image(cv::Rect(x, y, dst.cols, dst.rows));
-    dst.copyTo(croppedImage);
+    //cv::Mat image = randomImage;
+    //cv::Mat croppedImage;
+    //croppedImage = image(cv::Rect(x, y, dst.cols, dst.rows));
+    //dst.copyTo(croppedImage);
     std::string bboxName = imageName + ".txt";
     boundingBox(x, y, width, height, bboxName);
-    return image;
+    return dst;
 }
 
 

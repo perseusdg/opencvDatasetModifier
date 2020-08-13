@@ -36,7 +36,7 @@ int main()
     std::string analysisLocation =current_path + "/analysis.csv";
    
 
-    img->imageController(analysisCustomLocation,analysisLocation,fParser->lineNumbersReady -1,fParser->lineNumbersCustom -1);
+    img->imageController(analysisCustomLocation,analysisLocation,fParser->lineNumbersReady ,fParser->lineNumbersCustom );
    
    
     delete img;
