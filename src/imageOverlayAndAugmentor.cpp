@@ -179,7 +179,7 @@ cv::Mat imageOverlayAndAugmentor::GaussianNoise(const cv::Mat src, double Mean, 
 cv::Mat imageOverlayAndAugmentor::ColorJitter(const cv::Mat src, double maxjit)
 {
     cv::Mat img, dst;
-    cv::cvtColor(src, img, CV_BGR2HSV);
+    cv::cvtColor(src, img, cv::COLOR_BGR2HSV);
 
     std::random_device rd;
     std::mt19937 mt(rd());
@@ -199,7 +199,7 @@ cv::Mat imageOverlayAndAugmentor::ColorJitter(const cv::Mat src, double maxjit)
         }
     }
 
-    cv::cvtColor(img, dst, CV_HSV2BGR);
+    cv::cvtColor(img, dst, cv::COLOR_HSV2BGR);
 
     return dst;
 }
