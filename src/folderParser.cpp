@@ -4,11 +4,20 @@
 
 #include "folderParser.h"
 using namespace cv;
-namespace fs = std::filesystem;
+
 using std::cin;
 using std::cout;
 using std::fstream;
 using std::to_string;
+
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#endif
+
 
 void folderParser::FolderParser(std::string &pathToDirectory,bool custom)
 {
